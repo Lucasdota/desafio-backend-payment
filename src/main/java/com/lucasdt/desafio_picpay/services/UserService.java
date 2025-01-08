@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -22,6 +23,11 @@ public class UserService {
 
     public List<User> list() {
         return userRepository.findAll();
+    }
+
+    public User getUserById(Long id) throws Exception {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new Exception("User not found with id: " + id));
     }
 
 }
