@@ -2,6 +2,8 @@ package com.lucasdt.desafio_picpay.entities;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -16,15 +18,19 @@ public class User {
     @Column(unique = true)
     private String email;
     private String password;
+    private UserType userType;
+    private BigDecimal balance;
 
     public User() {}
 
-    public User(String firstName, String lastName, Long document, String email, String password) {
+    public User(String firstName, String lastName, Long document, String email, String password, UserType userType, BigDecimal balance) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.document = document;
         this.email = email;
         this.password = password;
+        this.userType = userType;
+        this.balance = balance;
     }
 
     public Long getId() {
@@ -51,6 +57,14 @@ public class User {
         return password;
     }
 
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -73,5 +87,13 @@ public class User {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 }
