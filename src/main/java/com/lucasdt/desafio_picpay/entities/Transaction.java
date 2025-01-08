@@ -21,6 +21,8 @@ public class Transaction {
     private User receiver;
     private LocalDateTime timestamp;
 
+    public Transaction() {}
+
     public Transaction(BigDecimal amount, User sender, User receiver) {
         this.amount = amount;
         this.sender = sender;

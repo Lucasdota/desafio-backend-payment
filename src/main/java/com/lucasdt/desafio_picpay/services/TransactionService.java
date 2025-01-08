@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Service
 public class TransactionService {
 
@@ -36,7 +38,6 @@ public class TransactionService {
             throw new Exception("Insufficient balance.");
         }
 
-        // Authorization check
         ResponseEntity<StatusDTO> authorizationResponseEntity = restTemplate.getForEntity("https://util.devi.tools/api/v2/authorize", StatusDTO.class);
         StatusDTO authorizationResponse = authorizationResponseEntity.getBody();
 
@@ -47,20 +48,24 @@ public class TransactionService {
             throw new Exception("Authorization denied.");
         }
 
-        ResponseEntity<NotificationStatusDTO> notificationResponseEntity = restTemplate.postForEntity("https://util.devi.tools/api/v1/notify", sender, NotificationStatusDTO.class);
-        NotificationStatusDTO notificationResponse = notificationResponseEntity.getBody();
+        //ResponseEntity<NotificationStatusDTO> notificationResponseEntity = restTemplate.postForEntity("https://util.devi.tools/api/v1/notify", sender, NotificationStatusDTO.class);
+        //NotificationStatusDTO notificationResponse = notificationResponseEntity.getBody();
 
-        if (notificationResponse == null) {
-            throw new Exception("Notification service offline.");
-        }
-        if ("fail".equalsIgnoreCase(notificationResponse.status())) {
-            throw new Exception("Notification denied.");
-        }
+        //if (notificationResponse == null) {
+        //    throw new Exception("Notification service offline.");
+        //}
+       // if ("fail".equalsIgnoreCase(notificationResponse.status())) {
+       //     throw new Exception("Notification denied.");
+       // }
 
         Transaction newTransaction = new Transaction(transaction.amount(), sender, receiver);
         sender.setBalance(sender.getBalance().subtract(transaction.amount()));
         receiver.setBalance(receiver.getBalance().add(transaction.amount()));
         transactionRepository.save(newTransaction);
         return newTransaction;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactionRepository.findAll();
     }
 }
