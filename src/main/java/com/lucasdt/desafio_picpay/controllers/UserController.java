@@ -17,13 +17,12 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<List<User>> create(@RequestBody UserDTO user) {
+    ResponseEntity<User> create(@RequestBody UserDTO user) {
         return ResponseEntity.ok(userService.create(user));
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getUsers() {
+    ResponseEntity<List<User>> list() {
         return ResponseEntity.ok(userService.list());
     }
-
 }

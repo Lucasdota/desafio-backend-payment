@@ -1,7 +1,7 @@
 package com.lucasdt.desafio_picpay.services;
 
-import com.lucasdt.desafio_picpay.dtos.NotificationStatusDTO;
-import com.lucasdt.desafio_picpay.dtos.StatusDTO;
+import com.lucasdt.desafio_picpay.dtos.AuthorizeDTO;
+import com.lucasdt.desafio_picpay.dtos.NotificationDTO;
 import com.lucasdt.desafio_picpay.dtos.TransactionDTO;
 import com.lucasdt.desafio_picpay.entities.Transaction;
 import com.lucasdt.desafio_picpay.entities.User;
@@ -9,7 +9,6 @@ import com.lucasdt.desafio_picpay.entities.UserType;
 import com.lucasdt.desafio_picpay.repositories.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,42 +29,45 @@ public class TransactionService {
         User sender = userService.getUserById(transaction.senderId());
         User receiver = userService.getUserById(transaction.receiverId());
 
-        if (sender.getUserType() == UserType.MERCHANT) {
-            throw new Exception("Merchants cannot transfer money.");
-        }
+        validateTransaction(sender, receiver, transaction);
 
-        if (sender.getBalance().compareTo(transaction.amount()) < 0) {
-            throw new Exception("Insufficient balance.");
-        }
-
-        ResponseEntity<StatusDTO> authorizationResponseEntity = restTemplate.getForEntity("https://util.devi.tools/api/v2/authorize", StatusDTO.class);
-        StatusDTO authorizationResponse = authorizationResponseEntity.getBody();
-
-        if (authorizationResponse == null) {
-            throw new Exception("Authorization service offline.");
-        }
-        if ("fail".equalsIgnoreCase(authorizationResponse.status())) {
-            throw new Exception("Authorization denied.");
-        }
-
-        //ResponseEntity<NotificationStatusDTO> notificationResponseEntity = restTemplate.postForEntity("https://util.devi.tools/api/v1/notify", sender, NotificationStatusDTO.class);
-        //NotificationStatusDTO notificationResponse = notificationResponseEntity.getBody();
-
-        //if (notificationResponse == null) {
-        //    throw new Exception("Notification service offline.");
-        //}
-       // if ("fail".equalsIgnoreCase(notificationResponse.status())) {
-       //     throw new Exception("Notification denied.");
-       // }
-
-        Transaction newTransaction = new Transaction(transaction.amount(), sender, receiver);
-        sender.setBalance(sender.getBalance().subtract(transaction.amount()));
-        receiver.setBalance(receiver.getBalance().add(transaction.amount()));
+        Transaction newTransaction = new Transaction(sender, receiver, transaction.value());
+        sender.setBalance(sender.getBalance().subtract(transaction.value()));
+        receiver.setBalance(receiver.getBalance().add(transaction.value()));
         transactionRepository.save(newTransaction);
         return newTransaction;
     }
 
-    public List<Transaction> getTransactions() {
+    public void validateTransaction(User sender, User receiver, TransactionDTO transaction) throws Exception {
+        if (sender == null || receiver == null) {
+            throw new Exception("User not found.");
+        }
+
+        if (sender.getUserType() == UserType.MERCHANT) {
+            throw new Exception("Merchants cannot send money.");
+        }
+        if (sender.getBalance().compareTo(transaction.value()) < 0) {
+            throw new Exception("Insufficient funds.");
+        }
+
+        AuthorizeDTO authorizeResponse = restTemplate.getForObject("https://util.devi.tools/api/v2/authorize", AuthorizeDTO.class);
+        if (authorizeResponse == null) {
+            throw new Exception("Authorization service offline.");
+        }
+        if (authorizeResponse.status().equalsIgnoreCase("fail")) {
+            throw new Exception("Authorization denied.");
+        }
+
+        //NotificationDTO notificationResponse = restTemplate.postForObject("https://util.devi.tools/api/v1/notify", sender, NotificationDTO.class);
+        //if (notificationResponse == null) {
+        //    throw new Exception("Notification service offline.");
+        //}
+        //if (notificationResponse.status().equalsIgnoreCase("fail")) {
+        //    throw new Exception("notification denied.");
+        //}
+    }
+
+    public List<Transaction> list() {
         return transactionRepository.findAll();
     }
 }

@@ -11,8 +11,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firstName;
-    private String lastName;
+    private String name;
     @Column(unique = true)
     private Long document;
     @Column(unique = true)
@@ -21,11 +20,10 @@ public class User {
     private UserType userType;
     private BigDecimal balance;
 
-    public User() {}
+    public User(){}
 
-    public User(String firstName, String lastName, Long document, String email, String password, UserType userType, BigDecimal balance) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public User(String name, Long document, String email, String password, UserType userType, BigDecimal balance) {
+        this.name = name;
         this.document = document;
         this.email = email;
         this.password = password;
@@ -37,60 +35,52 @@ public class User {
         return id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Long getDocument() {
         return document;
     }
 
+    public void setDocument(Long document) {
+        this.document = document;
+    }
+
     public String getEmail() {
         return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public UserType getUserType() {
-        return userType;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public void setDocument(Long document) {
-        this.document = document;
+    public String getPassword() {
+        return password;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public UserType getUserType() {
+        return userType;
     }
 
     public void setUserType(UserType userType) {
         this.userType = userType;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
     }
 
     public void setBalance(BigDecimal balance) {
