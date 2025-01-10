@@ -20,7 +20,7 @@ public class User {
     private UserType userType;
     private BigDecimal balance;
 
-    public User(){}
+    public User() {}
 
     public User(String name, Long document, String email, String password, UserType userType, BigDecimal balance) {
         this.name = name;
@@ -31,20 +31,20 @@ public class User {
         this.balance = balance;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getDocument() {

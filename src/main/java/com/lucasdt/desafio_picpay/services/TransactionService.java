@@ -1,18 +1,17 @@
 package com.lucasdt.desafio_picpay.services;
 
-import com.lucasdt.desafio_picpay.dtos.AuthorizeDTO;
-import com.lucasdt.desafio_picpay.dtos.NotificationDTO;
-import com.lucasdt.desafio_picpay.dtos.TransactionDTO;
+import com.lucasdt.desafio_picpay.dtos.AuthorizationDTO;
 import com.lucasdt.desafio_picpay.entities.Transaction;
 import com.lucasdt.desafio_picpay.entities.User;
 import com.lucasdt.desafio_picpay.entities.UserType;
 import com.lucasdt.desafio_picpay.repositories.TransactionRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TransactionService {
@@ -24,47 +23,36 @@ public class TransactionService {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Transactional
-    public Transaction create(TransactionDTO transaction) throws Exception {
-        User sender = userService.getUserById(transaction.senderId());
-        User receiver = userService.getUserById(transaction.receiverId());
-
-        validateTransaction(sender, receiver, transaction);
-
-        Transaction newTransaction = new Transaction(sender, receiver, transaction.value());
-        sender.setBalance(sender.getBalance().subtract(transaction.value()));
-        receiver.setBalance(receiver.getBalance().add(transaction.value()));
-        transactionRepository.save(newTransaction);
-        return newTransaction;
-    }
-
-    public void validateTransaction(User sender, User receiver, TransactionDTO transaction) throws Exception {
-        if (sender == null || receiver == null) {
+    public Transaction create(BigDecimal amount, Long senderId, Long receiverId) throws Exception {
+        Optional<User> sender = Optional.ofNullable(userService.getUserById(senderId));
+        Optional<User> receiver = Optional.ofNullable(userService.getUserById(receiverId));
+        if (sender.isEmpty() || receiver.isEmpty()) {
             throw new Exception("User not found.");
         }
 
+        validateTransaction(amount, sender.get(), receiver.get());
+
+        Transaction newTransaction = new Transaction(sender.get(), receiver.get(), amount);
+        sender.get().setBalance(sender.get().getBalance().subtract(amount));
+        receiver.get().setBalance(receiver.get().getBalance().add(amount));
+        return transactionRepository.save(newTransaction);
+    }
+
+    public void validateTransaction(BigDecimal amount, User sender, User receiver) throws Exception {
         if (sender.getUserType() == UserType.MERCHANT) {
-            throw new Exception("Merchants cannot send money.");
+            throw new Exception("Merchants cannot transfer money.");
         }
-        if (sender.getBalance().compareTo(transaction.value()) < 0) {
-            throw new Exception("Insufficient funds.");
+        if (sender.getBalance().compareTo(amount) < 0) {
+            throw new Exception("Not enough funds.");
         }
 
-        AuthorizeDTO authorizeResponse = restTemplate.getForObject("https://util.devi.tools/api/v2/authorize", AuthorizeDTO.class);
-        if (authorizeResponse == null) {
+        AuthorizationDTO authorizationResponse = restTemplate.getForObject("https://util.devi.tools/api/v2/authorize", AuthorizationDTO.class);
+        if (authorizationResponse == null) {
             throw new Exception("Authorization service offline.");
         }
-        if (authorizeResponse.status().equalsIgnoreCase("fail")) {
+        if (authorizationResponse.status().equalsIgnoreCase("fail")) {
             throw new Exception("Authorization denied.");
         }
-
-        //NotificationDTO notificationResponse = restTemplate.postForObject("https://util.devi.tools/api/v1/notify", sender, NotificationDTO.class);
-        //if (notificationResponse == null) {
-        //    throw new Exception("Notification service offline.");
-        //}
-        //if (notificationResponse.status().equalsIgnoreCase("fail")) {
-        //    throw new Exception("notification denied.");
-        //}
     }
 
     public List<Transaction> list() {

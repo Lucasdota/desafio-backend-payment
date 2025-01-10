@@ -17,7 +17,8 @@ public class UserService {
 
     public User create(UserDTO user) {
         User newUser = new User(user.name(), user.document(), user.email(), user.password(), user.userType(), user.balance());
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
+        return newUser;
     }
 
     public List<User> list() {

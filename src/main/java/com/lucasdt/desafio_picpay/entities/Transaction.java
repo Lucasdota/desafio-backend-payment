@@ -17,14 +17,22 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     private User receiver;
-    private BigDecimal value;
+    private BigDecimal amount;
 
-    public Transaction(){}
+    public Transaction() {}
 
-    public Transaction(User sender, User receiver, BigDecimal value) {
+    public Transaction(User sender, User receiver, BigDecimal amount) {
         this.sender = sender;
         this.receiver = receiver;
-        this.value = value;
+        this.amount = amount;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public User getSender() {
@@ -43,19 +51,11 @@ public class Transaction {
         this.receiver = receiver;
     }
 
-    public BigDecimal getValue() {
-        return value;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    public void setValue(BigDecimal value) {
-        this.value = value;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 }
