@@ -11,20 +11,20 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private BigDecimal amount;
     @ManyToOne
     @JoinColumn(name = "sender_id")
     private User sender;
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     private User receiver;
-    private BigDecimal amount;
 
     public Transaction() {}
 
-    public Transaction(User sender, User receiver, BigDecimal amount) {
+    public Transaction(BigDecimal amount, User sender, User receiver) {
+        this.amount = amount;
         this.sender = sender;
         this.receiver = receiver;
-        this.amount = amount;
     }
 
     public Long getId() {
@@ -33,6 +33,14 @@ public class Transaction {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     public User getSender() {
@@ -49,13 +57,5 @@ public class Transaction {
 
     public void setReceiver(User receiver) {
         this.receiver = receiver;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
     }
 }

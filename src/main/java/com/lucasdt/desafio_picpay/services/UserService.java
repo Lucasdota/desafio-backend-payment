@@ -1,8 +1,8 @@
 package com.lucasdt.desafio_picpay.services;
 
-import com.lucasdt.desafio_picpay.dtos.UserDTO;
 import com.lucasdt.desafio_picpay.entities.User;
 import com.lucasdt.desafio_picpay.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +15,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User create(UserDTO user) {
-        User newUser = new User(user.name(), user.document(), user.email(), user.password(), user.userType(), user.balance());
-        userRepository.save(newUser);
-        return newUser;
+    @Transactional
+    public User create(User user) {
+        return userRepository.save(user);
     }
 
     public List<User> list() {
