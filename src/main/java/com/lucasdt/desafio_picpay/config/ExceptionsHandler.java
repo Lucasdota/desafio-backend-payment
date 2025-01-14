@@ -11,11 +11,11 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     ResponseEntity<ExceptionDTO> treatDuplicateEntry(DataIntegrityViolationException e) {
-        return ResponseEntity.badRequest().body(new ExceptionDTO("User already exists.", 400));
+        return ResponseEntity.badRequest().body(new ExceptionDTO("User already exists.", 500));
     }
 
     @ExceptionHandler(Exception.class)
-    ResponseEntity<ExceptionDTO> treatGeneralExceptions(Exception e) {
-        return ResponseEntity.internalServerError().body(new ExceptionDTO(e.getMessage(), 404));
+    ResponseEntity<ExceptionDTO> treatGeneralException(Exception e) {
+        return ResponseEntity.internalServerError().body(new ExceptionDTO(e.getMessage(), 400));
     }
 }
