@@ -1,5 +1,6 @@
 package com.lucasdt.desafio_picpay.controllers;
 
+import com.lucasdt.desafio_picpay.dtos.ResponseTransactionDTO;
 import com.lucasdt.desafio_picpay.dtos.TransactionDTO;
 import com.lucasdt.desafio_picpay.entities.Transaction;
 import com.lucasdt.desafio_picpay.services.TransactionService;
@@ -17,12 +18,12 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @PostMapping
-    ResponseEntity<Transaction> create(@RequestBody TransactionDTO data) throws Exception {
-        return ResponseEntity.ok(transactionService.create(data));
+    ResponseEntity<Transaction> create(@RequestBody TransactionDTO transaction) throws Exception {
+        return ResponseEntity.ok(transactionService.create(transaction));
     }
 
     @GetMapping
-    ResponseEntity<List<Transaction>> list() {
+    ResponseEntity<List<ResponseTransactionDTO>> list() {
         return ResponseEntity.ok(transactionService.list());
     }
 }

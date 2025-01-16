@@ -5,17 +5,23 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RestControllerAdvice
 public class ExceptionsHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    ResponseEntity<ExceptionDTO> treatDuplicateEntry(DataIntegrityViolationException e) {
-        return ResponseEntity.badRequest().body(new ExceptionDTO("User already exists.", 500));
+    public ResponseEntity<ExceptionDTO> treatDuplicateEntry(DataIntegrityViolationException e) {
+        return ResponseEntity.badRequest().body(new ExceptionDTO("User already exists!", 500));
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<ExceptionDTO> treatURLAccessError(HttpClientErrorException e) {
+        return ResponseEntity.badRequest().body(new ExceptionDTO("Authorization denied!", 500));
     }
 
     @ExceptionHandler(Exception.class)
-    ResponseEntity<ExceptionDTO> treatGeneralException(Exception e) {
+    public ResponseEntity<ExceptionDTO> treatGeneralExceptions(Exception e) {
         return ResponseEntity.internalServerError().body(new ExceptionDTO(e.getMessage(), 400));
     }
 }

@@ -15,8 +15,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User create(UserDTO data) {
-        User newUser = new User(data.name(), data.document(), data.email(), data.password(), data.userType(), data.balance());
+    public User create(UserDTO user) {
+        User newUser = new User(user.name(), user.document(), user.email(), user.password(), user.userType(), user.balance());
         return userRepository.save(newUser);
     }
 
@@ -24,7 +24,8 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public User getUserById(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.orElse(null);
     }
 }

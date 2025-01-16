@@ -1,6 +1,7 @@
 package com.lucasdt.desafio_picpay.services;
 
 import com.lucasdt.desafio_picpay.dtos.AuthorizationDTO;
+import com.lucasdt.desafio_picpay.dtos.ResponseTransactionDTO;
 import com.lucasdt.desafio_picpay.dtos.TransactionDTO;
 import com.lucasdt.desafio_picpay.entities.Transaction;
 import com.lucasdt.desafio_picpay.entities.User;
@@ -11,8 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TransactionService {
@@ -24,26 +25,36 @@ public class TransactionService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public Transaction create(TransactionDTO data) throws Exception {
-        Optional<User> sender = userService.getUserById(data.senderId());
-        Optional<User> receiver = userService.getUserById(data.receiverId());
-        if (sender.isEmpty() || receiver.isEmpty()) {
-            throw new Exception("User not found.");
+    public Transaction create(TransactionDTO transaction) throws Exception {
+        User sender = userService.getUserById(transaction.senderId());
+        User receiver = userService.getUserById(transaction.receiverId());
+        if (sender ==  null || receiver == null) {
+            throw new Exception("User not found");
         }
-        validateTransaction(data.amount(), sender.get());
-        sender.get().setBalance(sender.get().getBalance().subtract(data.amount()));
-        receiver.get().setBalance(receiver.get().getBalance().add(data.amount()));
-        Transaction newTransaction = new Transaction(data.amount(), sender.get(), receiver.get());
+        validateTransaction(transaction.amount(), sender);
+        sender.setBalance(sender.getBalance().subtract(transaction.amount()));
+        receiver.setBalance(receiver.getBalance().add(transaction.amount()));
+        Transaction newTransaction = new Transaction(transaction.amount(), sender, receiver);
         return transactionRepository.save(newTransaction);
     }
 
-    public List<Transaction> list() {
-        return transactionRepository.findAll();
+    public List<ResponseTransactionDTO> list() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        List<ResponseTransactionDTO> response = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            Long id = transaction.getId();
+            BigDecimal amount = transaction.getAmount();
+            Long senderId = transaction.getSender().getId();
+            Long receiverId = transaction.getReceiver().getId();
+            ResponseTransactionDTO responseObj = new ResponseTransactionDTO(id, amount, senderId, receiverId);
+            response.add(responseObj);
+        }
+        return response;
     }
 
     public void validateTransaction(BigDecimal amount, User sender) throws Exception {
         if (sender.getUserType() == UserType.MERCHANT) {
-            throw new Exception("Merchants cannot transfer money.");
+            throw new Exception("Merchants cannot transfer money");
         }
         if (sender.getBalance().compareTo(amount) < 0) {
             throw new Exception("Not enough balance.");
