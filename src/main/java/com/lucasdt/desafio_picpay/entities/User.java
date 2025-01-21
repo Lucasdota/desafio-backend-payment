@@ -20,7 +20,7 @@ public class User {
     private UserType userType;
     private BigDecimal balance;
 
-    public User(){}
+    public User() {}
 
     public User(String name, Long document, String email, String password, UserType userType, BigDecimal balance) {
         this.name = name;

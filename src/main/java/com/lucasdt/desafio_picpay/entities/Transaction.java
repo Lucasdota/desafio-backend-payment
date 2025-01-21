@@ -19,7 +19,7 @@ public class Transaction {
     @JoinColumn(name = "receiver_id")
     private User receiver;
 
-    public Transaction(){}
+    public Transaction() {}
 
     public Transaction(BigDecimal amount, User sender, User receiver) {
         this.amount = amount;

@@ -15,9 +15,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User create(UserDTO user) {
-        User newUser = new User(user.name(), user.document(), user.email(), user.password(), user.userType(), user.balance());
-        return userRepository.save(newUser);
+    public User create(UserDTO data) {
+        User user = new User(data.name(), data.document(), data.email(), data.password(), data.userType(), data.balance());
+        return userRepository.save(user);
     }
 
     public List<User> list() {

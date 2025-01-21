@@ -1,7 +1,7 @@
 package com.lucasdt.desafio_picpay.controllers;
 
-import com.lucasdt.desafio_picpay.dtos.ResponseTransactionDTO;
 import com.lucasdt.desafio_picpay.dtos.TransactionDTO;
+import com.lucasdt.desafio_picpay.dtos.TransactionResponse;
 import com.lucasdt.desafio_picpay.entities.Transaction;
 import com.lucasdt.desafio_picpay.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +18,12 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @PostMapping
-    ResponseEntity<Transaction> create(@RequestBody TransactionDTO transaction) throws Exception {
-        return ResponseEntity.ok(transactionService.create(transaction));
+    ResponseEntity<Transaction> create(@RequestBody TransactionDTO data) throws Exception {
+        return ResponseEntity.ok(transactionService.create(data));
     }
 
     @GetMapping
-    ResponseEntity<List<ResponseTransactionDTO>> list() {
+    ResponseEntity<List<TransactionResponse>> list() {
         return ResponseEntity.ok(transactionService.list());
     }
 }
