@@ -12,12 +12,12 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ExceptionDTO> treatDuplicateEntry(DataIntegrityViolationException e) {
-        return ResponseEntity.badRequest().body(new ExceptionDTO("User already exists.", 500));
+        return ResponseEntity.badRequest().body(new ExceptionDTO("User already exists!", 500));
     }
 
     @ExceptionHandler(HttpClientErrorException.class)
-    public ResponseEntity<ExceptionDTO> treatAuthorizationDenied(HttpClientErrorException e) {
-        return ResponseEntity.badRequest().body(new ExceptionDTO("Authorization denied.", 500));
+    public ResponseEntity<ExceptionDTO> treatAuthorizationDenial(HttpClientErrorException e) {
+        return ResponseEntity.badRequest().body(new ExceptionDTO("Authorization denied!", 500));
     }
 
     @ExceptionHandler(Exception.class)
